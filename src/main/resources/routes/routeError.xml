@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans                                                  http://www.springframework.org/schema/beans/spring-beans.xsd                                                  http://camel.apache.org/schema/spring                                                  http://camel.apache.org/schema/spring/camel-spring-2.25.4.xsd">
+    <routeContext id="routeError" xmlns="http://camel.apache.org/schema/spring">
+        <route id="_routeConnectionRefused">
+            <from id="_from_ConnRefused" uri="direct:errorConnectionRefused"/>
+            <log id="_log_Error-ConnRefused" message="Error -> Json Malformado: ${exception}, ${body}, ${date:now}"/>
+            <setProperty id="_setP_ConnRefused_CODE" propertyName="CODE_ERROR">
+                <simple>CCCS-02</simple>
+            </setProperty>
+            <setProperty id="_setP_ConnRefused_MSG" propertyName="MSG_ERROR">
+                <simple>Nexus API Error</simple>
+            </setProperty>
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE" id="_setP_ConnRefused_CODE-HTTP">
+                <constant>404</constant>
+            </setHeader>
+            <setProperty id="_setProperty_TYPE-CONN-REFUSED" propertyName="TIPO_LOG">
+                <simple>REQ-SOAP</simple>
+            </setProperty>
+            <to id="_to1" uri="direct:errorError"/>
+        </route>
+        <route id="_routeConnectionTimeout">
+            <from id="_from1" uri="direct:errorConnectionTimeout"/>
+            <log id="_log1" message="Error -> Json Malformado:  ${exception}, ${body}, ${date:now}"/>
+            <setProperty id="_setProperty_CODE_ERROR" propertyName="CODE_ERROR">
+                <simple>CCCS-03</simple>
+            </setProperty>
+            <setProperty id="_setProperty_MSG_ERROR" propertyName="MSG_ERROR">
+                <simple>Nexus API Error</simple>
+            </setProperty>
+            <!-- <setProperty  propertyName="CANAL">
+                <simple>-</simple>
+            </setProperty> -->
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE" id="_setHeader1">
+                <constant>404</constant>
+            </setHeader>
+            <setProperty id="_setProperty_TYPE-CONN-TIMEOUT" propertyName="TIPO_LOG">
+                <simple>REQ-SOAP</simple>
+            </setProperty>
+            <to id="_to2" uri="direct:errorError"/>
+        </route>
+        <route id="_routeErrorJsonInvalido">
+            <from id="_fromErrorJsonInvalido" uri="direct:errorJsonInvalid"/>
+            <log id="_log_Error_Unmarshal" message="Error -> Json Malformado:  ${exception}, ${body}, ${date:now}"/>
+            <setProperty id="_setProp_CodeErrorJsonInvalido" propertyName="CODE_ERROR">
+                <simple>CCCS-04</simple>
+            </setProperty>
+            <setProperty id="_setProperty3_MSG_ERROR" propertyName="MSG_ERROR">
+                <simple>JSON Invalido</simple>
+            </setProperty>
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE" id="_setHeader2">
+                <constant>500</constant>
+            </setHeader>
+            <setProperty id="_setProperty_TYPE-ErrorJsonInvalido" propertyName="TIPO_LOG">
+                <simple>REQ</simple>
+            </setProperty>
+            <to id="_to3" uri="direct:errorError"/>
+        </route>
+        <route id="_routeErrorNoDataJson">
+            <from id="_fromErrorNoDataJson" uri="direct:errorNoDataJson"/>
+            <log id="_log_Error_UnmarshalInvalid" message="Error -> Falta Json Entrante:  ${exception}, ${body}, ${date:now}"/>
+            <setHeader headerName="Content-Type" id="_setHeaderResp-NoJSON">
+                <constant>application/json; charset:utf-8</constant>
+            </setHeader>
+            <setProperty id="_setProperty2Invalid" propertyName="CODE_ERROR">
+                <simple>CCCS-05</simple>
+            </setProperty>
+            <setProperty id="_setPropertyInvalid3" propertyName="MSG_ERROR">
+                <simple>Json invalido</simple>
+            </setProperty>
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE" id="_setHeader3">
+                <constant>500</constant>
+            </setHeader>
+            <setProperty id="_setProperty_TYPE-ErrorMapingNoDataJson" propertyName="TIPO_LOG">
+                <simple>REQ</simple>
+            </setProperty>
+            <to id="_to4" uri="direct:errorError"/>
+        </route>
+        <route id="_routeErrorValidateData">
+            <from id="_fromErrorNoDataJson" uri="direct:errorValidateData"/>
+            <setHeader headerName="CamelExceptionHandler" id="_setHeader1Validate">
+                <simple>${exception}</simple>
+            </setHeader>
+            <setProperty id="_setProperty6" propertyName="CODE_ERROR">
+                <simple>CCCS-06</simple>
+            </setProperty>
+            <setProperty id="_setProperty8" propertyName="TIMESTAMP_RESPONSE_ERROR">
+                <simple>${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}</simple>
+            </setProperty>
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE" id="_setHeader4">
+                <constant>500</constant>
+            </setHeader>
+            <to id="_toVelocityResponseJsonERRORValidate" uri="velocity:velocity/JsonErrorCaseValidate.vm"/>
+            <bean id="_bean_REQ_JsonERRORValidate"
+                method="getExecutionTime" ref="loadDataConsultaServicio"/>
+            <log id="_Log_TRAZA_REQ_JsonERRORValidate"
+                loggingLevel="INFO" message=">>>>> [${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}] [INFO] [${exchangeProperty.ID_REQ}] &quot;REQ&quot;  &quot;${headers.CamelHttpMethod} ${headers.CamelServletContextPath}&quot;  &quot;${exchangeProperty.INPUT_CANAL}&quot; &quot;1&quot;  &quot;${exchangeProperty.TIEMPO_EJECUCION}&quot; [${body}]"/>
+            <stop id="_stop2"/>
+        </route>
+        <route id="_routeErrorGenerateResponse">
+            <from id="_fromErrorNoDataJson" uri="direct:errorGenerateResponse"/>
+            <log id="_log_Error_ErrorGenerateResponse" message="Error -> :  ${exception}, ${body}, ${date:now}"/>
+            <setHeader headerName="Content-Type" id="_setHeaderResp-ErrorMapingResponse">
+                <constant>application/json; charset:utf-8</constant>
+            </setHeader>
+            <setProperty id="_setProperty_Code-ErrorMapingResponse" propertyName="CODE_ERROR">
+                <simple>CCCS-07</simple>
+            </setProperty>
+            <setProperty id="_setProperty_MSG-ErrorMapingResponse" propertyName="MSG_ERROR">
+                <simple>Error generando Response</simple>
+            </setProperty>
+            <setProperty id="_setProperty_DATETIME-ErrorMapingResponse" propertyName="TIMESTAMP_RESPONSE_ERROR">
+                <simple>${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}</simple>
+            </setProperty>
+            <setHeader headerName="Exchange.HTTP_RESPONSE_CODE" id="_setHeader_HTTP-ErrorMapingResponse">
+                <constant>500</constant>
+            </setHeader>
+            <setProperty id="_setProperty_TYPE-ErrorMapingResponse" propertyName="TIPO_LOG">
+                <simple>RES</simple>
+            </setProperty>
+            <to id="_to5" uri="direct:errorError"/>
+        </route>
+        <route id="_routeERROR">
+            <from id="_from_ERROR" uri="direct:errorError"/>
+            <setProperty id="_setP_TIME" propertyName="TIMESTAMP_RESPONSE_ERROR">
+                <simple>${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}</simple>
+            </setProperty>
+            <to id="_setP_Velocity" uri="velocity:velocity/JsonErrorCase.vm"/>
+            <bean id="_bean_REQ_Error" method="getExecutionTime" ref="loadDataConsultaServicio"/>
+            <log id="_Log_TRAZA_REQ_ErrorMapingResponse"
+                loggingLevel="INFO" message=">>>>> [${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}] [INFO] [${exchangeProperty.ID_REQ}] &quot;${exchangeProperty.TIPO_LOG}&quot;  &quot;${headers.CamelHttpMethod} ${headers.CamelServletContextPath}&quot;  &quot;${exchangeProperty.INPUT_CANAL}&quot; &quot;1&quot;  &quot;${exchangeProperty.TIEMPO_EJECUCION}&quot; [${body}]"/>
+            <stop id="_set_Error-STOP"/>
+        </route>
+    </routeContext>
+</beans>

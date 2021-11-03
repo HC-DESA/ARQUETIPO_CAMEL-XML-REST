@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd      http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.25.4.xsd">
+    <!--     sslContextParameters 
+	<camel:sslContextParameters certAlias="root"
+        id="sslContextParameters" secureSocketProtocol="TLSv1.2">
+        <camel:trustManagers>
+            <camel:keyStore password="Test123"
+                resource="/jks/JavaKeystore.jks" type="JKS"/>
+        </camel:trustManagers>
+    </camel:sslContextParameters>
+	<camel:sslContextParameters certAlias="root"
+        id="sslContextParameters" secureSocketProtocol="TLSv1.2">
+        <camel:trustManagers>
+            <camel:keyStore password="Test123"
+                resource="C:\\BancoInter\\GIT\\credit-card-api\\jks\\JavaKeystore.jks" type="JKS"/>
+        </camel:trustManagers>
+    </camel:sslContextParameters>
+ -->
+	<camel:sslContextParameters certAlias="root"
+        id="sslContextParameters" secureSocketProtocol="TLSv1.2">
+        <camel:trustManagers>
+            <camel:keyStore password="Test123"
+                resource="/jks/JavaKeystore.jks" type="JKS"/>
+        </camel:trustManagers>
+    </camel:sslContextParameters>
+    <!-- Importar rutas para servicio ConsultaSaldo -->
+    <import resource="../routes/routeConsultaSaldo.xml"/>
+    <import resource="../routes/routeCallSOAP.xml"/>
+    <import resource="../routes/routeError.xml"/>
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <!-- Declaracion de rutas Importadas para ConsultaSaldo-->
+        <routeContextRef ref="routeConsultaSaldo"/>
+        <routeContextRef ref="routeCallSOAP"/>
+        <routeContextRef ref="routeError"/>
+		<dataFormats>
+            <!-- Transformacion datos entrantes ConsultaSaldo -->
+            <json id="transform-json" library="Jackson"/>
+            <json id="jsonToObjectConsultaSaldo" library="Jackson"
+                prettyPrint="true" unmarshalTypeName="cl.bcointer.models.DataInputConsultaSaldo"/>
+        </dataFormats>
+        <!-- Excepcion general -->
+        <onException>
+            <exception>java.lang.Exception</exception>
+            <handled>
+                <simple>true</simple>
+            </handled>
+            <log message=">>>>> ERROR  GENERAL "/>
+            <to id="_to_RouteError4" uri="direct:errorGenerateResponse"/>
+        </onException>
+        <!--         Configuracion base REST DSL -->
+        <restConfiguration bindingMode="off" component="servlet" contextPath="/api"/>
+        <rest apiDocs="true" consumes="application/json" id="rest-1"
+            path="/v1" produces="application/json">
+            <!-- Metodo POST servicio ** CONSULTA-SALDOS ** -->
+            <post id="METOD-1" uri="service/test">
+                <to uri="direct:routeConsultaSaldos"/>
+            </post>
+        </rest>
+    </camelContext>
+</beans>

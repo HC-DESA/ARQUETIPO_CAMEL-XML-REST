@@ -1,0 +1,7 @@
+{
+  "coderror": "$!{exchange.properties.CODE_ERROR}",
+  "msgerror": "$!{exchange.properties.MSG_ERROR}",
+  "timestamp": "$!{exchange.properties.TIMESTAMP_RESPONSE_ERROR}",
+  "canal": "$!{exchange.properties.INPUT_CANAL}",
+  "id_emisor_servicio": "$!{exchange.properties.ID_EMISOR}"
+}
