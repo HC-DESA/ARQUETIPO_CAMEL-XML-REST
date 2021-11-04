@@ -27,20 +27,10 @@
         </camel:trustManagers>
     </camel:sslContextParameters>
     <!-- Importar rutas para servicio ConsultaSaldo -->
-    <import resource="../routes/routeConsultaSaldo.xml"/>
-    <import resource="../routes/routeCallSOAP.xml"/>
-    <import resource="../routes/routeError.xml"/>
+    <import resource="../routes/routeTestSplit.xml"/>
     <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
         <!-- Declaracion de rutas Importadas para ConsultaSaldo-->
-        <routeContextRef ref="routeConsultaSaldo"/>
-        <routeContextRef ref="routeCallSOAP"/>
-        <routeContextRef ref="routeError"/>
-		<dataFormats>
-            <!-- Transformacion datos entrantes ConsultaSaldo -->
-            <json id="transform-json" library="Jackson"/>
-            <json id="jsonToObjectConsultaSaldo" library="Jackson"
-                prettyPrint="true" unmarshalTypeName="cl.bcointer.models.DataInputConsultaSaldo"/>
-        </dataFormats>
+        <routeContextRef ref="routeTestSplit"/>
         <!-- Excepcion general -->
         <onException>
             <exception>java.lang.Exception</exception>
@@ -56,7 +46,7 @@
             path="/v1" produces="application/json">
             <!-- Metodo POST servicio ** CONSULTA-SALDOS ** -->
             <post id="METOD-1" uri="service/test">
-                <to uri="direct:routeConsultaSaldos"/>
+                <to uri="direct:routeTestSplit"/>
             </post>
         </rest>
     </camelContext>

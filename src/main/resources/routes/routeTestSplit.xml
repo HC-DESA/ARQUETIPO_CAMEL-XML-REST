@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.25.4.xsd">
+    <routeContext id="routeTestSplit" xmlns="http://camel.apache.org/schema/spring">
+        <route id="_route_ReceptionData" streamCache="true">
+            <from id="_fromIR1" uri="direct:routeTestSplit"/>
+            <!-- <log message="INPUT : \n ${body}"/> -->
+            <split>
+                <xpath>orders/items/order</xpath>
+                <!-- <log message="SPLIT : ${body}"/> -->
+                <setProperty propertyName="ID">
+                    <xpath>order/id/text()</xpath>
+                </setProperty>
+                <log message="ID : ${exchangeProperty.ID}"/>
+                <setProperty propertyName="NAME">
+                    <xpath>order/name/text()</xpath>
+                </setProperty>
+                <log message="NAME : ${exchangeProperty.NAME}"/>
+                 <setProperty propertyName="TEL">
+                    <xpath>order/tel/text()</xpath>
+                </setProperty>
+                <log message="TEL : ${exchangeProperty.TEL}"/>
+            </split>
+            <setBody>
+                <simple>{ "response" : "SUCCESS"}</simple>
+            </setBody>
+            <setHeader headerName="Content-Type">
+                <constant>application/json; charset:utf-8</constant>
+            </setHeader>
+            <log message="RESPONSE BODY: \n ${body}"/>
+        </route>       
+    </routeContext>
+</beans>
