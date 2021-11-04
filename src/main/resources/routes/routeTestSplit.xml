@@ -1,33 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.25.4.xsd">
+	<!--     BEANS -->
+    <bean class="cl.test.bean.TestBean" id="testBean"/>
+    <!--     Strategy -->
+    <bean class="cl.test.strategy.AddOrders" id="addOrderStrategy"/>
     <routeContext id="routeTestSplit" xmlns="http://camel.apache.org/schema/spring">
         <route id="_route_ReceptionData" streamCache="true">
-            <from id="_fromIR1" uri="direct:routeTestSplit"/>
             <!-- <log message="INPUT : \n ${body}"/> -->
-            <split>
+            <from id="_fromIR1" uri="direct:routeTestSplit"/>
+            <split id="_split1" strategyRef="addOrderStrategy" streaming="true">
                 <xpath>orders/items/order</xpath>
-                <!-- <log message="SPLIT : ${body}"/> -->
-                <setProperty propertyName="ID">
+                <setProperty id="_setProperty1" propertyName="ID">
                     <xpath>order/id/text()</xpath>
                 </setProperty>
-                <log message="ID : ${exchangeProperty.ID}"/>
-                <setProperty propertyName="NAME">
+                <setProperty id="_setProperty2" propertyName="NAME">
                     <xpath>order/name/text()</xpath>
                 </setProperty>
-                <log message="NAME : ${exchangeProperty.NAME}"/>
-                 <setProperty propertyName="TEL">
+                <setProperty id="_setProperty3" propertyName="TEL">
                     <xpath>order/tel/text()</xpath>
                 </setProperty>
-                <log message="TEL : ${exchangeProperty.TEL}"/>
+                <setProperty id="_setProperty1" propertyName="A">
+                    <xpath>order/A/text()</xpath>
+                </setProperty>
+                <setProperty id="_setProperty2" propertyName="B">
+                    <xpath>order/B/text()</xpath>
+                </setProperty>
+                <setProperty id="_setProperty2" propertyName="C">
+                    <xpath>order/C/text()</xpath>
+                </setProperty>
+                <setProperty id="_setProperty2" propertyName="D">
+                    <xpath>order/D/text()</xpath>
+                </setProperty>
+            <bean id="_beanAddOrder" method="testData" ref="testBean"/>
             </split>
-            <setBody>
+            <split id="_split2" strategyRef="addOrderStrategy" streaming="true">
+                <simple>${body}</simple>
+                <log message="ID   : ${body.getId()}"/>
+                <log message="NAME : ${body.getName()}"/>
+                <log message="TEL  : ${body.getTel()}"/>
+                <log message="A    : ${body.getA()}"/>
+                <log message="B    : ${body.getB()}"/>
+                <log message="C    : ${body.getC()}"/>
+                <log message="D    : ${body.getD()}"/>
+            </split>
+            <setBody id="_setBody1">
                 <simple>{ "response" : "SUCCESS"}</simple>
             </setBody>
-            <setHeader headerName="Content-Type">
+            <setHeader headerName="Content-Type" id="_setHeader1">
                 <constant>application/json; charset:utf-8</constant>
             </setHeader>
-            <log message="RESPONSE BODY: \n ${body}"/>
-        </route>       
+            <log id="_log4" message="RESPONSE BODY: \n ${body}"/>
+        </route>
     </routeContext>
 </beans>

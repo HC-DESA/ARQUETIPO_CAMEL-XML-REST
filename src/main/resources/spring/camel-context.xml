@@ -38,7 +38,6 @@
                 <simple>true</simple>
             </handled>
             <log message=">>>>> ERROR  GENERAL "/>
-            <to id="_to_RouteError4" uri="direct:errorGenerateResponse"/>
         </onException>
         <!--         Configuracion base REST DSL -->
         <restConfiguration bindingMode="off" component="servlet" contextPath="/api"/>

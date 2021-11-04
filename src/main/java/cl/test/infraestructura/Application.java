@@ -1,4 +1,4 @@
-package cl.bcointer.infraestructura;
+package cl.test.infraestructura;
 
 import org.apache.camel.component.servlet.CamelHttpTransportServlet;
 import org.springframework.boot.SpringApplication;
