@@ -34,7 +34,7 @@
                 </setProperty>
             <bean id="_beanAddOrder" method="testData" ref="testBean"/>
             </split>
-            <split id="_split2" strategyRef="addOrderStrategy" streaming="true">
+            <split id="_split2" strategyRef="addOrderStrategy">
                 <simple>${body}</simple>
                 <log message="ID   : ${body.getId()}"/>
                 <log message="NAME : ${body.getName()}"/>
